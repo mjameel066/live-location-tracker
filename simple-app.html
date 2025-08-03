@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Tracker - Keep Your Family Safe</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h1 class="text-2xl font-bold text-gray-900">Live Location Tracker</h1>
+                <p class="text-gray-600">Keep your family safe</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter your email"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter your password"
+                    />
+                </div>
+
+                <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"></div>
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                >
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button
+                    id="showRegister"
+                    class="text-blue-600 hover:text-blue-800"
+                >
+                    Don't have an account? Sign up
+                </button>
+            </div>
+        </div>
+
+        <!-- Registration Form (hidden by default) -->
+        <div id="registerForm" class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md hidden">
+            <div class="text-center mb-8">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h1 class="text-2xl font-bold text-gray-900">Create Account</h1>
+                <p class="text-gray-600">Join Live Location Tracker</p>
+            </div>
+
+            <form id="registrationForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input
+                            type="text"
+                            id="firstName"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input
+                            type="text"
+                            id="lastName"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                        type="email"
+                        id="regEmail"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input
+                        type="password"
+                        id="regPassword"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div id="regErrorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"></div>
+                <div id="regSuccessMessage" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded"></div>
+
+                <button
+                    type="submit"
+                    id="registerButton"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                >
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button
+                    id="showLogin"
+                    class="text-blue-600 hover:text-blue-800"
+                >
+                    Already have an account? Sign in
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+        
+        // DOM elements
+        const loginFormDiv = document.querySelector('.bg-white');
+        const registerFormDiv = document.getElementById('registerForm');
+        const showRegisterBtn = document.getElementById('showRegister');
+        const showLoginBtn = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registrationForm = document.getElementById('registrationForm');
+
+        // Show/hide forms
+        showRegisterBtn.addEventListener('click', () => {
+            loginFormDiv.classList.add('hidden');
+            registerFormDiv.classList.remove('hidden');
+        });
+
+        showLoginBtn.addEventListener('click', () => {
+            registerFormDiv.classList.add('hidden');
+            loginFormDiv.classList.remove('hidden');
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+            
+            loginButton.textContent = 'Signing in...';
+            loginButton.disabled = true;
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect to dashboard or show success
+                    alert('Login successful! Welcome to Live Location Tracker.');
+                    // Here you would typically redirect to the dashboard
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                loginButton.textContent = 'Sign In';
+                loginButton.disabled = false;
+            }
+        });
+
+        // Registration form submission
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                email: document.getElementById('regEmail').value,
+                phone_number: document.getElementById('phoneNumber').value,
+                password: document.getElementById('regPassword').value
+            };
+            
+            const errorDiv = document.getElementById('regErrorMessage');
+            const successDiv = document.getElementById('regSuccessMessage');
+            const registerButton = document.getElementById('registerButton');
+            
+            registerButton.textContent = 'Creating Account...';
+            registerButton.disabled = true;
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successDiv.textContent = 'Registration successful! Please check your email to verify your account.';
+                    successDiv.classList.remove('hidden');
+                    registrationForm.reset();
+                } else {
+                    errorDiv.textContent = data.message || 'Registration failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                registerButton.textContent = 'Create Account';
+                registerButton.disabled = false;
+            }
+        });
+
+        // Test API health
+        fetch(`${API_BASE_URL}/health`)
+            .then(response => response.json())
+            .then(data => console.log('API Health:', data))
+            .catch(err => console.error('API Health Check Failed:', err));
+    </script>
+</body>
+</html>
+
